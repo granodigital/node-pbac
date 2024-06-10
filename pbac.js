@@ -19,15 +19,17 @@ const map = require('lodash/fp/map');
 const flatten = require('lodash/fp/flatten');
 const find = require('lodash/fp/find');
 
+const debug = require('debug')('pbac');
+
 const PBAC = function constructor(policies, options) {
   options = isPlainObject(options) ? options : {};
-  const myconditions = isPlainObject(options.conditions) ? Object.assign(options.conditions, conditions) : conditions;
+  const myConditions = isPlainObject(options.conditions) ? Object.assign(options.conditions, conditions) : conditions;
 
   this.policies = [];
   this.validateSchema = isBoolean(options.validateSchema) ? options.validateSchema : true;
   this.validatePolicies = isBoolean(options.validatePolicies) ? options.validatePolicies : true;
   this.schema = isPlainObject(options.schema) ? options.schema : policySchema;
-  this.conditions = myconditions;
+  this.conditions = myConditions;
 
   this.addConditionsToSchema();
   if (this.validateSchema) this._validateSchema();
@@ -74,27 +76,38 @@ Object.assign(PBAC.prototype, {
       principal: {},
       context: options.variables || {},
     }, options || {});
-    if (this.filterPoliciesBy({
-        effect: 'Deny',
-        resource: options.resource,
-        action: options.action,
-        context: options.context,
-        principal: options.principal,
-      })) return false;
-    return !!this.filterPoliciesBy({
-      effect: 'Allow',
-      resource: options.resource,
-      action: options.action,
-      context: options.context,
-      principal: options.principal,
+    const { action, resource, principal, context } = options;
+    const actionDebug = debug.extend(action);
+    actionDebug('evaluating policies', { resource, principal, context });
+    const denyPolicy = this.filterPoliciesBy({
+      effect: 'Deny',
+      resource,
+      action,
+      context,
+      principal,
     });
+    if (denyPolicy) {
+      actionDebug('denied by policy:', denyPolicy);
+      return false
+    };
+    const allowPolicy = this.filterPoliciesBy({
+      effect: 'Allow',
+      resource,
+      action,
+      context,
+      principal,
+    });
+    actionDebug('allowed by policy:', allowPolicy ?? 'NONE, IMPLICIT DENY');
+    return !!allowPolicy;
   },
   filterPoliciesBy(options) {
     return flow(
       map('Statement'),
       flatten,
       find(statement => {
+        const actionDebug = debug.extend(options.action);
         if (statement.Effect !== options.effect) return false;
+        if (statement.Action?.includes(options.action)) actionDebug('evaluating matching statement', statement);
         if (statement.Principal && !this.evaluatePrincipal(statement.Principal, options.principal, options.context))
           return false;
         if (statement.NotPrincipal && this.evaluateNotPrincipal(statement.NotPrincipal, options.principal, options.context))
@@ -139,6 +152,7 @@ Object.assign(PBAC.prototype, {
     });
   },
   evaluateAction(actions, reference) {
+    actions = isArray(actions) ? actions : [actions];
     return actions.find(action => {
       return this.conditions.StringLike.call(this, reference, action);
     });
