@@ -1,5 +1,5 @@
 {
-  "name": "@grano/pbac",
+  "name": "@granodigital/pbac",
   "version": "0.3.2",
   "description": "AWS IAM Policy inspired and (mostly) compatible evaluation engine",
   "dependencies": {
@@ -30,6 +30,6 @@
     "conditions.js"
   ],
   "publishConfig": {
-    "@grano:registry": "https://npm.pkg.github.com"
+    "@granodigital:registry": "https://npm.pkg.github.com"
   }
 }
