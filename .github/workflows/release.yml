@@ -1,6 +1,8 @@
 name: Release
 
 on:
+  # TODO: Enable once we are using our helpers to filter releases.
+  # pull_request:
   push:
     branches:
       - master
@@ -24,6 +26,8 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+      # TODO: Use our own helpers see
+      # https://github.com/granodigital/grano-cas-client/blob/master/.github/workflows/test-and-publish.yml
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
