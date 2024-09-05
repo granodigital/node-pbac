@@ -1,0 +1,10 @@
+branches:
+  - master
+  - name: develop
+    channel: beta
+    prerelease: true
+parserOpts:
+  noteKeywords:
+    - BREAKING CHANGE
+    - BREAKING CHANGES
+    - BREAKING

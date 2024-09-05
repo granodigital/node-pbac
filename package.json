@@ -1,5 +1,5 @@
 {
-  "name": "pbac",
+  "name": "@grano/pbac",
   "version": "0.3.2",
   "description": "AWS IAM Policy inspired and (mostly) compatible evaluation engine",
   "dependencies": {
@@ -14,7 +14,8 @@
   },
   "devDependencies": {
     "doctoc": "^2.2.0",
-    "mocha": "^10.0.0"
+    "mocha": "^10.0.0",
+    "semantic-release": "^24.1.0"
   },
   "repository": {
     "type": "git",
@@ -27,5 +28,8 @@
     "pbac.js",
     "schema.json",
     "conditions.js"
-  ]
+  ],
+  "publishConfig": {
+    "@grano:registry": "https://npm.pkg.github.com"
+  }
 }
