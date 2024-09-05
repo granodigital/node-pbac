@@ -19,7 +19,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "monken/node-pbac"
+    "url": "granodigital/node-pbac"
   },
   "main": "pbac.js",
   "author": "Moritz Onken <onken@netcubed.de>",
